@@ -1,7 +1,7 @@
-Role Name
+NGINX Reverse Proxy / LoadBalancer
 =========
 
-A brief description of the role goes here.
+Ansible role for automated installation of nginx load balancer and config.
 
 Requirements
 ------------
