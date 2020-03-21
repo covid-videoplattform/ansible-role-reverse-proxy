@@ -36,6 +36,12 @@
       src: templates/covid-videoplattform.conf.j2
       dest: /etc/nginx/sites-available/covid-videoplattform.conf
 
+- name: enable vhost
+  file:
+    src: /etc/nginx/sites-available/covid-videoplattform.conf
+    dest: /etc/nginx/sites-enabled/covid-videoplattform.conf
+    state: link
+
 - name: enable nginx service
   systemd:
       name: nginx
