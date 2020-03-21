@@ -1,0 +1,47 @@
+---
+# tasks file for ansible-role-reverse-proxy
+
+- name: install base packages
+  apt:
+      name: "{{ item }}"
+      state: present
+  with_list:
+      - ufw
+      - bmon
+      - htop
+      - vim
+      - nginx
+
+- name: configure firewall rules
+  ufw:
+      rule: "{{ item.rule }}"
+      port: "{{ item.port }}"
+      proto: "{{ item.proto }}"
+  with_items:
+      - { rule: 'allow', port: '22', proto: 'tcp' }
+      - { rule: 'allow', port: '80', proto: 'tcp' }
+      - { rule: 'allow', port: '443', proto: 'tcp' }
+
+- name: set logging
+  ufw:
+    logging: 'off'
+
+- name: set ufw policy
+  ufw:
+    state: enabled
+    policy: deny
+
+- name: deploy nginx config template
+  template:
+      src: templates/covid-videoplattform.conf.j2
+      dest: /etc/nginx/sites-available/covid-videoplattform.conf
+
+- name: enable nginx service
+  systemd:
+      name: nginx
+      enabled: yes
+
+- name: restart nginx service
+  systemd:
+      name: nginx
+      state: restarted

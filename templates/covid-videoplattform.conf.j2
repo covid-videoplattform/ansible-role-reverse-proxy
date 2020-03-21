@@ -1,0 +1,35 @@
+# Upstreams
+upstream backend {
+    least_conn;
+    {% for frontend_host in groups.frontend_servers %}
+        server {{ host_vars[frontend_host].internal_ip }}:443
+    {% endfor %}
+}
+
+# HTTPS Server
+server {
+    listen 443;
+    server_name {{ jitsi_domain }};
+    error_log /var/log/nginx/jitsi-meet-error.log;
+    ssl on;
+    ssl_certificate /etc/letsencrypt/live/{{ jitsi_domain }}/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/{{ jitsi_domain }}/privkey.pem;
+    ssl_protocols TLSv1.2;
+    ssl_ciphers EECDH+AESGCM:EDH+AESGCM;
+    ssl_prefer_server_ciphers on;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains; preload";
+    access_log /var/log/nginx/jitsi-meet-access.log;
+    location / {
+        proxy_pass https://backend/;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $http_host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forward-Proto http;
+        proxy_set_header X-Nginx-Proxy true;
+        proxy_redirect off;
+        proxy_ssl_verify off;
+    }
+}
