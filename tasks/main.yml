@@ -31,7 +31,7 @@
 
 - name: deploy nginx config template
   template:
-      src: templates/covid-videoplattform.conf.j2
+      src: covid-videoplattform.conf.j2
       dest: /etc/nginx/sites-available/covid-videoplattform.conf
 
 - name: enable vhost
