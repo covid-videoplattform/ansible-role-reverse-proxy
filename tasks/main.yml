@@ -31,14 +31,14 @@
 
 - name: deploy nginx config template
   template:
-      src: covid-videoplattform.conf.j2
-      dest: /etc/nginx/sites-available/covid-videoplattform.conf
+      src: jitsi.conf.j2
+      dest: /etc/nginx/sites-available/jitsi
   notify: restart nginx service
 
 - name: enable vhost
   file:
-    src: /etc/nginx/sites-available/covid-videoplattform.conf
-    dest: /etc/nginx/sites-enabled/covid-videoplattform.conf
+    src: /etc/nginx/sites-available/jitsi
+    dest: /etc/nginx/sites-enabled/jitsi
     state: link
   notify: restart nginx service
 
