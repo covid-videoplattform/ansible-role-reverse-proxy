@@ -21,49 +21,30 @@ server {
     access_log /var/log/nginx/jitsi-meet-access.log;
     location / {
         proxy_pass https://backend/;
-        proxy_http_version 1.1;
-        proxy_set_header Upgrade $http_upgrade;
-        proxy_set_header Connection "upgrade";
         proxy_set_header Host $http_host;
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
-        proxy_set_header X-Forward-Proto http;
         proxy_set_header X-Nginx-Proxy true;
         proxy_redirect off;
         proxy_ssl_verify off;
     }
-    location /http-bind {
+    # BOSH
+    location = /http-bind {
         proxy_pass      http://{{prosody_ip}}:5280/http-bind;
         proxy_set_header X-Forwarded-For $remote_addr;
         proxy_set_header Host $http_host;
+        proxy_buffering off;
+        tcp_nodelay on;
     }
     # xmpp websockets
     location /xmpp-websocket {
-        proxy_pass http://{{prosody_ip}}:5280/xmpp-websocket?prefix=$prefix&$args;
+        proxy_pass http://{{prosody_ip}}:5280;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
-        proxy_set_header Host $http_host;
+        proxy_set_header Host $host;
         tcp_nodelay on;
     }
-    # BOSH for subdomains
-    location ~ ^/([^/?&:'"]+)/http-bind {
-        set $subdomain "$1.";
-        set $subdir "$1/";
-        set $prefix "$1";
-
-        rewrite ^/(.*)$ /http-bind;
-    }
-
-    # websockets for subdomains
-    location ~ ^/([^/?&:'"]+)/xmpp-websocket {
-        set $subdomain "$1.";
-        set $subdir "$1/";
-        set $prefix "$1";
-
-        rewrite ^/(.*)$ /xmpp-websocket;
-    }
-
 }
 
 server {
