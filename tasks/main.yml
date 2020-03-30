@@ -33,19 +33,16 @@
   template:
       src: covid-videoplattform.conf.j2
       dest: /etc/nginx/sites-available/covid-videoplattform.conf
+  notify: restart nginx service
 
 - name: enable vhost
   file:
     src: /etc/nginx/sites-available/covid-videoplattform.conf
     dest: /etc/nginx/sites-enabled/covid-videoplattform.conf
     state: link
+  notify: restart nginx service
 
 - name: enable nginx service
   systemd:
       name: nginx
       enabled: yes
-
-- name: restart nginx service
-  systemd:
-      name: nginx
-      state: restarted
