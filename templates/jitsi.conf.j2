@@ -1,7 +1,7 @@
 # Upstreams
 upstream backend {
     least_conn;
-    {% for frontend_host in groups.frontend_servers %}
+    {% for frontend_host in groups.jists_webservers %}
         server {{ hostvars[frontend_host].internal_ip }}:443;
     {% endfor %}
 }
